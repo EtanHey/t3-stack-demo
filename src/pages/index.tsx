@@ -1,11 +1,10 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
-import Link from "next/link";
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const user = useUser();
+  const { data } = api.recipes.getAll.useQuery();
   return (
     <>
       <Head>
@@ -17,6 +16,11 @@ export default function Home() {
         <div>
           <h1>{!user.isSignedIn && <SignInButton />}</h1>
           <h1>{!!user.isSignedIn && <SignOutButton />}</h1>
+        </div>
+        <div>
+          {data?.map((recipe) => (
+            <div key={recipe.id}>{recipe.description}</div>
+          ))}
         </div>
       </main>
     </>
