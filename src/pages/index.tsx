@@ -47,7 +47,7 @@ const RecipeView = (props: RecipeWithUser) => {
       />
       <div className="flex flex-col gap-2">
         <div className="flex gap-2 text-slate-300">
-          <span>{`@ ${author.username}`}</span>
+          <span>{`@${author.username}`}</span>
           <span>·</span>
           <span className="font-thin">{dayjs(recipe.createdAt).fromNow()}</span>
         </div>
@@ -57,12 +57,26 @@ const RecipeView = (props: RecipeWithUser) => {
   );
 };
 
-const Home: NextPage = () => {
-  const user = useUser();
-  const { data, isLoading } = api.recipes.getAll.useQuery();
+const Feed = () => {
+  const { data, isLoading: recipesLoading } = api.recipes.getAll.useQuery();
+  if (recipesLoading) return <LoadingPage />;
+  if (!data) return <div>Something went wrong</div>;
+  return (
+    <div className="flex flex-col">
+      {data?.map((RecipeInfo) => (
+        <RecipeView key={RecipeInfo.recipe.id} {...RecipeInfo} />
+      ))}
+    </div>
+  );
+};
 
-  if (!data && isLoading ) return <LoadingPage size={60} />;
-  
+const Home: NextPage = () => {
+  const { user, isLoaded: userLoaded, isSignedIn } = useUser();
+
+  api.recipes.getAll.useQuery();
+  // return empty div if both aren't  loaded, since user tends to load faster
+  if (!userLoaded) return <div />;
+
   return (
     <>
       <Head>
@@ -74,24 +88,20 @@ const Home: NextPage = () => {
         <div className="h-full w-full border-x border-slate-400 md:max-w-2xl">
           <div className="flex border-b border-slate-400 p-4">
             <h1>
-              {!user.isSignedIn && (
+              {!isSignedIn && (
                 <div className="flex justify-center">
                   <SignInButton />
                 </div>
               )}
             </h1>
 
-            {!!user.isSignedIn && (
+            {!!isSignedIn && (
               <div className="flex w-full justify-center">
                 <CreateRecipeWizard />
               </div>
             )}
           </div>
-          <div className="flex flex-col">
-            {data?.map((RecipeInfo) => (
-              <RecipeView key={RecipeInfo.recipe.id} {...RecipeInfo} />
-            ))}
-          </div>
+          <Feed />
         </div>
       </main>
     </>
