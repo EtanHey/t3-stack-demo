@@ -37,7 +37,7 @@ type RecipeWithUser = RouterOutputs["recipes"]["getAll"][number];
 const RecipeView = (props: RecipeWithUser) => {
   const { recipe, author } = props;
   return (
-    <div key={recipe.id} className="flex gap-3 border-b border-slate-500 p-4">
+    <div key={recipe.id} className="flex gap-3 border-b border-slate-500 p-4 ">
       <Image
         src={author.profileImageUrl}
         alt={`${author.username} profile image`}
@@ -51,7 +51,7 @@ const RecipeView = (props: RecipeWithUser) => {
           <span>·</span>
           <span className="font-thin">{dayjs(recipe.createdAt).fromNow()}</span>
         </div>
-        <span>{recipe.description}</span>
+        <span className="text-2xl">{recipe.description}</span>
       </div>
     </div>
   );
