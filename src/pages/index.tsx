@@ -7,6 +7,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
 import Image from "next/image";
+import LoadingPage from "~/components/loadingComps";
 
 dayjs.extend(relativeTime);
 
@@ -26,7 +27,7 @@ const CreateRecipeWizard = () => {
         type="text"
         placeholder="type some recipe description"
         className="w-full bg-transparent outline-none"
-      ></input>
+      />
     </div>
   );
 };
@@ -59,13 +60,9 @@ const RecipeView = (props: RecipeWithUser) => {
 const Home: NextPage = () => {
   const user = useUser();
   const { data, isLoading } = api.recipes.getAll.useQuery();
-  if (!data && isLoading)
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-        <SignInButton />
-      </div>
-    );
+
+  if (!data && isLoading ) return <LoadingPage size={60} />;
+  
   return (
     <>
       <Head>
