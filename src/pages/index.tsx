@@ -63,9 +63,9 @@ const RecipeView = (props: RecipeWithUser) => {
       <Image
         src={author.profileImageUrl}
         alt={`${author.username} profile image`}
-        width={45}
-        height={45}
-        className="h-12 w-12 rounded-full"
+        width={32}
+        height={32}
+        className="h-8 w-h-8 rounded-full"
       />
       <div className="flex flex-col gap-2">
         <div className="flex gap-2 text-slate-300">
