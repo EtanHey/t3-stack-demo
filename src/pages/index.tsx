@@ -8,11 +8,15 @@ import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
 import Image from "next/image";
 import LoadingPage from "~/components/loadingComps";
+import { BaseSyntheticEvent, useState } from "react";
+import { NewRecipe } from "~/components/NewRecipe";
 
 dayjs.extend(relativeTime);
 
 const CreateRecipeWizard = () => {
   const { user } = useUser();
+  const { mutate } = api.recipes.create.useMutation();
+  const [input, setInput] = useState<string>("");
   if (!user) return null;
   return (
     <div className="flex grow gap-3">
@@ -27,7 +31,18 @@ const CreateRecipeWizard = () => {
         type="text"
         placeholder="type some recipe description"
         className="w-full bg-transparent outline-none"
+        value={input}
+        onChange={(e) => {
+          setInput(e.target.value);
+        }}
       />
+      <button
+        className="flex items-center gap-1 bg-slate-600 rounded-xl py-1 px-3"
+        onClick={() => mutate({ content: input })}
+      >
+        <p className="whitespace-nowrap text-slate-300">Post recipe</p>
+        <NewRecipe />
+      </button>
     </div>
   );
 };
@@ -63,7 +78,7 @@ const Feed = () => {
   if (!data) return <div>Something went wrong</div>;
   return (
     <div className="flex flex-col">
-      {data?.map((RecipeInfo) => (
+      {data.map((RecipeInfo) => (
         <RecipeView key={RecipeInfo.recipe.id} {...RecipeInfo} />
       ))}
     </div>
