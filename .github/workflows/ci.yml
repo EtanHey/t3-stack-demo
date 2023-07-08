@@ -16,19 +16,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14" # Change to the desired Node.js version
-
       - name: Install dependencies
-        run: npm i
+        run: npm install
 
-      - name: Run type checking
+      - name: Typecheck
         run: npm run typecheck # Replace with the appropriate script name
 
-      - name: Run linting
+      - name: lint
         run: npm run lint # Replace with the appropriate script name
+
+      - name: Print Environment Variables
+        run: echo $MY_ENV_VAR
