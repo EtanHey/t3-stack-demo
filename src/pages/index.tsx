@@ -15,8 +15,14 @@ dayjs.extend(relativeTime);
 
 const CreateRecipeWizard = () => {
   const { user } = useUser();
-  const { mutate } = api.recipes.create.useMutation();
+  const ctx = api.useContext();
   const [input, setInput] = useState<string>("");
+  const { mutate, isLoading: isPosting } = api.recipes.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      void ctx.recipes.getAll.invalidate();
+    },
+  });
   if (!user) return null;
   return (
     <div className="flex grow gap-3">
@@ -35,9 +41,10 @@ const CreateRecipeWizard = () => {
         onChange={(e) => {
           setInput(e.target.value);
         }}
+        disabled={isPosting}
       />
       <button
-        className="flex items-center gap-1 bg-slate-600 rounded-xl py-1 px-3"
+        className="flex items-center gap-1 rounded-xl bg-slate-600 px-3 py-1"
         onClick={() => mutate({ content: input })}
       >
         <p className="whitespace-nowrap text-slate-300">Post recipe</p>
