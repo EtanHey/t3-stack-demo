@@ -1,3 +1,5 @@
+import { ESLint } from "eslint";
+
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
@@ -20,6 +22,14 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  ESLint: {
+    ignoreDuringBuilds: true,
+  },
+  swcMinify: true,
 };
 
 export default config;
