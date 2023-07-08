@@ -45,6 +45,16 @@ const ratelimit = new Ratelimit({
 });
 
 export const recipesRouter = createTRPCRouter({
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const recipe = await ctx.prisma.recipe.findUnique({
+        where: { id: input.id },
+      });
+      if (!recipe) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return (await addUserDataToRecipes([recipe]))[0];
+    }),
   getAll: publicProcedure.query(async ({ ctx }) => {
     const recipes = await ctx.prisma.recipe.findMany({
       take: 100,

@@ -1,16 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
-
 import { api } from "~/utils/api";
-import { appRouter } from "~/server/api/root";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import { prisma } from "~/server/db";
-import superjson from "superjson";
 import { PageLayout } from "~/components/PageLayout";
 import Image from "next/image";
 import LoadingPage from "~/components/loadingComps";
 import RecipeView from "~/components/RecipeView";
+import { generateSSGHelper } from "~/server/helpers/ssgHelper";
 
 const ProfileFeed = ({ userId }: { userId: string }) => {
   const { data, isLoading } = api.recipes.getRecipesByUserId.useQuery({
@@ -30,7 +26,7 @@ const ProfileFeed = ({ userId }: { userId: string }) => {
 
 const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   const { data } = api.profile.getUserByUsername.useQuery({
-    username: username,
+    username,
   });
   if (!data || !data.username) return <div>404</div>;
   return (
@@ -57,12 +53,7 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   );
 };
 export const getStaticProps: GetStaticProps = async (context) => {
-  const ssg = createServerSideHelpers({
-    router: appRouter,
-    ctx: { prisma, userId: null },
-    transformer: superjson, // optional - adds superjson serialization
-  });
-
+  const ssg = generateSSGHelper();
   const slug = context.params?.slug;
 
   if (typeof slug !== "string") throw new Error("no slug");
