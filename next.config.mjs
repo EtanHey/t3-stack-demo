@@ -26,7 +26,7 @@ const config = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  ESLint: {
+  eslint: {
     ignoreDuringBuilds: true,
   },
   swcMinify: true,
