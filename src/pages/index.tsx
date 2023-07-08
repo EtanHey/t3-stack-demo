@@ -7,9 +7,11 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
 import Image from "next/image";
-import LoadingPage from "~/components/loadingComps";
+import LoadingPage, { LoadingSpinner } from "~/components/loadingComps";
 import { BaseSyntheticEvent, useState } from "react";
-import { NewRecipe } from "~/components/NewRecipe";
+import { NewRecipeSVG } from "~/components/NewRecipeSVG";
+import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 dayjs.extend(relativeTime);
 
@@ -21,6 +23,9 @@ const CreateRecipeWizard = () => {
     onSuccess: () => {
       setInput("");
       void ctx.recipes.getAll.invalidate();
+    },
+    onError: () => {
+      toast.error("Failed to post recipe, please try again later!");
     },
   });
   if (!user) return null;
@@ -41,15 +46,30 @@ const CreateRecipeWizard = () => {
         onChange={(e) => {
           setInput(e.target.value);
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input !== "") mutate({ content: input });
+          }
+        }}
         disabled={isPosting}
       />
-      <button
-        className="flex items-center gap-1 rounded-xl bg-slate-600 px-3 py-1"
-        onClick={() => mutate({ content: input })}
-      >
-        <p className="whitespace-nowrap text-slate-300">Post recipe</p>
-        <NewRecipe />
-      </button>
+      {input !== "" && (
+        <button
+          className="flex items-center gap-1 rounded-xl bg-slate-600 px-3 py-1"
+          onClick={() => mutate({ content: input })}
+          disabled={isPosting}
+        >
+          {isPosting ? (
+            <LoadingSpinner size={20} />
+          ) : (
+            <>
+              <p className="whitespace-nowrap text-slate-300">Post recipe</p>
+              <NewRecipeSVG />
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 };
@@ -60,18 +80,26 @@ const RecipeView = (props: RecipeWithUser) => {
   const { recipe, author } = props;
   return (
     <div key={recipe.id} className="flex gap-3 border-b border-slate-500 p-4 ">
-      <Image
-        src={author.profileImageUrl}
-        alt={`${author.username} profile image`}
-        width={32}
-        height={32}
-        className="h-8 w-h-8 rounded-full"
-      />
+      <Link href={`/@${author.username}`}>
+        <Image
+          src={author.profileImageUrl}
+          alt={`${author.username} profile image`}
+          width={32}
+          height={32}
+          className="w-h-8 h-8 rounded-full"
+        />
+      </Link>
       <div className="flex flex-col gap-2">
         <div className="flex gap-2 text-slate-300">
-          <span>{`@${author.username}`}</span>
-          <span>·</span>
-          <span className="font-thin">{dayjs(recipe.createdAt).fromNow()}</span>
+          <Link href={`/@${author.username}`}>
+            <span>{`@${author.username}`}</span>
+          </Link>
+          <Link href={`/recipe/${recipe.id}`}>
+            <span>·</span>
+            <span className="font-thin">
+              {dayjs(recipe.createdAt).fromNow()}
+            </span>
+          </Link>
         </div>
         <span className="text-2xl">{recipe.description}</span>
       </div>

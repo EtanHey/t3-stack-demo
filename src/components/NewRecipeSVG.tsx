@@ -1,6 +1,6 @@
 import React from "react";
 
-export const NewRecipe = () => {
+export const NewRecipeSVG = () => {
   return (
     <svg
       fill="white"

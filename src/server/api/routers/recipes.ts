@@ -61,14 +61,20 @@ export const recipesRouter = createTRPCRouter({
   create: privateProcedure
     .input(
       z.object({
-        content: z.string().min(1).max(280),
+
+        content: z
+          .string()
+          .min(1)
+          .max(280),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const authorId = ctx.userId;
 
       const { success } = await ratelimit.limit(authorId);
+
       if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
+
       const recipe = await ctx.prisma.recipe.create({
         data: {
           authorId,
