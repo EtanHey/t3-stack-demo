@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { SignInButton, useUser } from "@clerk/nextjs";
+import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import type { NextPage } from "next";
 import { api } from "~/utils/api";
 import Image from "next/image";
@@ -9,7 +9,6 @@ import { NewRecipeSVG } from "~/components/NewRecipeSVG";
 import { toast } from "react-hot-toast";
 import { PageLayout } from "~/components/PageLayout";
 import RecipeView from "~/components/RecipeView";
-
 
 const CreateRecipeWizard = () => {
   const { user } = useUser();
@@ -72,7 +71,12 @@ const CreateRecipeWizard = () => {
 
 const Feed = () => {
   const { data, isLoading: recipesLoading } = api.recipes.getAll.useQuery();
-  if (recipesLoading) return <LoadingPage />;
+  if (recipesLoading)
+    return (
+      <div className="flex flex-grow">
+        <LoadingPage />
+      </div>
+    );
   if (!data) return <div>Something went wrong</div>;
   return (
     <div className="flex flex-col">
@@ -94,13 +98,9 @@ const Home: NextPage = () => {
     <>
       <PageLayout>
         <div className="flex border-b border-slate-400 p-4">
-          <h1>
-            {!isSignedIn && (
-              <div className="flex justify-center">
-                <SignInButton />
-              </div>
-            )}
-          </h1>
+            <div className="z-10 flex justify-center">
+              {!isSignedIn ? <SignInButton /> : <SignOutButton />}
+            </div>
 
           {!!isSignedIn && (
             <div className="flex w-full justify-center">
